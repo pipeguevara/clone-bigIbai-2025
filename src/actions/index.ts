@@ -1,5 +1,6 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
+import { saveNewsletterEmail } from '../newsletter/services/subscribe';
 
 export const server = {
     newsletter: defineAction({
@@ -7,13 +8,22 @@ export const server = {
             email: z.string().email()
         }),
         async handler({ email }) {
-            console.log(email);
+            const { duplicate, success, error } = await saveNewsletterEmail(email);
 
-            if(email === "a34750567@gmail.com"){
+            if(!success){
                 throw new Error("This email is not allowed.");
             }
 
-            return { success: true };
+            if(duplicate){
+                return {
+                    messege: 'This email is already subscribed to the newsletter.',
+                    success: true
+                }
+            }
+
+            return { success: true
+                , messege: 'Thank you for subscribing to the newsletter!'
+             };
         }
     })
 }

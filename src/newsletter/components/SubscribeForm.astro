@@ -33,22 +33,30 @@ import { actions } from "astro:actions";
 <script>
   import { actions } from "astro:actions";
   import { throwConfetti } from "../../utils/confetti";
-  
 
-  const form = document.getElementById("newsletter-form") as HTMLFormElement | null;
-  form?.addEventListener("submit", async (e) => {
+  const form = document.getElementById("newsletter-form") as HTMLFormElement;
+  const message = document.getElementById(
+    "newsletter-message"
+  ) as HTMLDivElement;
+  message.classList.remove("hidden");
+  message.classList.add("text-green-500, text-red-500");
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
-    const email=formData.get('email') as string;
+    const email = formData.get("email") as string;
 
     const { data, error } = await actions.newsletter({ email });
-    if(error){
-      console.error(error);
+    if (error) {
+      message.textContent = error.message;
+      message.classList.remove("hidden");
+      message.classList.add("text-red-500");
     }
-    if(data){
-      console.log(data);
+    if (data) {
+      message.textContent = data.messege;
+      message.classList.remove("hidden");
+      message.classList.add("text-green-500");
       throwConfetti();
     }
-
   });
 </script>
